@@ -1,6 +1,7 @@
 import React from "react";
 
 function WeatherDisplay( {data} ) {
+    console.log(process.env.REACT_APP_API_KEY)
     console.log(data)
     return (
         <div className="WeatherDisplay">
