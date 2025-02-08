@@ -1,23 +1,19 @@
-import logo from './logo.svg';
 import './App.css';
+import React, { useState } from 'react';
+import NavBar from './components/NavBar';
+import WeatherDisplay from './components/WeatherDisplay';
+import Footer from './components/Footer';
+
 
 function App() {
+  const [weatherData, setWeatherData] = useState(null);
+  const [error, setError] = useState(null);  
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <NavBar weather={setWeatherData} err={setError} />
+      {weatherData && <WeatherDisplay data={weatherData} />}
+      <Footer />
     </div>
   );
 }
