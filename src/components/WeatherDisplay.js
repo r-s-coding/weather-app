@@ -1,7 +1,6 @@
 import React from "react";
 
 function WeatherDisplay( {data} ) {
-    console.log(data)
     return (
         <div className="WeatherDisplay">
             <h1>{data.main.temp} &#176;C</h1>
