@@ -1,31 +1,52 @@
 import React, { useState } from "react";
-import { fetchGeoLocation, fetchWeatherData } from "../utilities";
+import Locations from "./Locations";
+import { fetchGeoLocations, fetchWeatherData } from "../utilities";
 
 function NavBar( {weather, err}) {
     const [city, setCity] = useState("");
-    const fetchData = async () => {
-        const locationData = await fetchGeoLocation(city);
-        if (locationData === 'Location not found' || locationData === 'Something went wrong ... Please try again') {
-            err(locationData);
-            return;
-        }
-        const weatherData = await fetchWeatherData(locationData[0].lat, locationData[0].lon);
-        if (weatherData === 'Weather data not found' || weatherData === 'Something went wrong ... Please try again') {
-            err(weatherData);
-            return;
-        }
-        weather(weatherData);
-    }
+    const [locations, setLocations] = useState([]);
+    const [showDropdown, setShowDropdown] = useState(false);
 
-    const handleSubmit = (e) => {
+    // Function to handle searching for a city
+    const handleSearch = async (e) => {
         e.preventDefault();
-        fetchData();
+        if (city.trim()) {
+            const geoData = await fetchGeoLocations(city);
+            if (geoData.message) {
+                err(geoData.message);
+                return;
+            }
+            if (geoData.length === 0) {
+                err('Location not found');
+                return;
+            }
+            err(null);
+            setLocations(geoData);
+            setShowDropdown(true);            
+        }
+    };
+
+    // Function to handle the weather data based on the location selected
+    const handleLocationSelection = async (location) => {
+        const weatherData = await fetchWeatherData(location.lat, location.lon);
+        if (weatherData.message) {
+            err(weatherData.message);
+            return;
+        }
+        if (weatherData.length === 0) {
+            err('Weather data not found');
+            return;
+        }
+        err(null);
+        weather(weatherData);
+        setShowDropdown(false);
+        setCity("");
     }
 
     return (
         <div className="NavBar">
-            <h1>Weather App</h1>
-            <form onSubmit={handleSubmit}>
+            <p>Weather App</p>
+            <form onSubmit={handleSearch}>
                 <input
                     type="text"
                     placeholder="Enter City"
@@ -34,6 +55,7 @@ function NavBar( {weather, err}) {
                 />
                 <button type="submit">Search</button>
             </form>
+            {showDropdown && <Locations locations={locations} handleLocationSelection={handleLocationSelection} />}
         </div>
     );
 }
